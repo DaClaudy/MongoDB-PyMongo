@@ -59,3 +59,79 @@ class MongoManager:
                 raise Exception("Unable to list the collections:", str(e))
         else:
             raise Exception("Database not selected.")
+        
+    def create_one_document(self, document: dict):
+        if self.collection is None:
+            raise Exception("Collection not selected.")
+        try:
+            insert_result = self.collection.insert_one(document)
+            return {
+                "acknowledged": insert_result.acknowledged,
+                "insertedId": str(insert_result.inserted_id)
+            }
+        except Exception as e:
+            raise Exception("Unable to insert the document due to the following error: " + str(e))
+
+    def create_many_documents(self, documents: list[dict]):
+        if self.collection is None:
+            raise Exception("Collection not selected.")
+        try:
+            insert_result = self.collection.insert_many(documents)
+            return {
+                "acknowledged": insert_result.acknowledged,
+                "insertedIds": [str(_id) for _id in insert_result.inserted_ids]
+            }
+        except Exception as e:
+            raise Exception("Unable to insert the documents due to the following error: " + str(e))
+        
+    def update_one_document(self, query: dict, new_values: dict):
+        try:
+            update_result = self.collection.update_one(query, new_values)
+            return {
+                "acknowledged": update_result.acknowledged,
+                "insertedId": update_result.upserted_id,
+                "matchedCount": update_result.matched_count,
+                "modifiedCount": update_result.modified_count,
+            }
+        except Exception as e:
+            raise Exception("Unable to update the document due to the following error:", str(e))
+
+    def update_many_documents(self, query: dict, new_values: dict):
+        try:
+            update_result = self.collection.update_many(query, new_values)
+            return {
+                "acknowledged": update_result.acknowledged,
+                "insertedId": update_result.upserted_id,
+                "matchedCount": update_result.matched_count,
+                "modifiedCount": update_result.modified_count,
+            }
+        except Exception as e:
+            raise Exception("Unable to update the documents due to the following error:", str(e))
+        
+    def read_one_document(self, query: dict):
+        try:
+            document = self.collection.find_one(query)
+            return document
+        except Exception as e:
+            raise Exception("Unable to read the document due to the following error:", str(e))
+
+    def read_many_documents(self, query: dict):
+        try:
+            documents = self.collection.find(query)
+            return list(documents)
+        except Exception as e:
+            raise Exception("Unable to read the documents due to the following error:", str(e))
+
+    def delete_one_document(self, query: dict):
+        try:
+            delete_result = self.collection.delete_one(query)
+            return {"acknowledged": delete_result.acknowledged, "deletedCount": delete_result.deleted_count}
+        except Exception as e:
+            raise Exception("Unable to delete the document due to the following error:", str(e))
+
+    def delete_many_documents(self, query: dict):
+        try:
+            delete_result = self.collection.delete_many(query)
+            return {"acknowledged": delete_result.acknowledged, "deletedCount": delete_result.deleted_count}
+        except Exception as e:
+            raise Exception("Unable to delete the documents due to the following error:", str(e))
