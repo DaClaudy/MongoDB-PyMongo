@@ -21,6 +21,14 @@ class MongoManager:
             self.collection = coll_name
 
     @property
+    def client(self):
+        return self.__client
+    
+    @client.setter
+    def client(self, value):
+        self.__client = value
+
+    @property
     def db(self):
         return self.__db
 
@@ -41,10 +49,6 @@ class MongoManager:
         self.__collection = self.db[coll_name]
         print(f"Collection set to: {coll_name}")
 
-    def close_connection(self):
-        self.__client.close()
-        print("Connection closed.")
-
     def list_databases(self):
         try:
             return self.__client.list_database_names()
@@ -59,6 +63,10 @@ class MongoManager:
                 raise Exception("Unable to list the collections:", str(e))
         else:
             raise Exception("Database not selected.")
+        
+    def set_collection(self, collection_name):
+        self.collection = self.client[self.db][collection_name]
+
         
     def create_one_document(self, document: dict):
         if self.collection is None:
@@ -135,3 +143,7 @@ class MongoManager:
             return {"acknowledged": delete_result.acknowledged, "deletedCount": delete_result.deleted_count}
         except Exception as e:
             raise Exception("Unable to delete the documents due to the following error:", str(e))
+        
+    def close_connection(self):
+        self.__client.close()
+        print("Connection closed.")
