@@ -219,7 +219,7 @@ def exercice_5(collection_name):
     # 9. Magasin le plus proche d’un point
     user_point = [50.12, 10.45]
 
-    # Assure-toi que l’index géospatial est bien créé !
+    # S'assurer que l’index géospatial est bien créé
     collection.create_index([("location", "2dsphere")])
 
     closest_shop = collection.find_one({
